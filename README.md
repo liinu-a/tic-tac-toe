@@ -1,5 +1,8 @@
 # Tic-tac-toe
 
+[![GHA workflow badge](https://github.com/liinu-a/tic-tac-toe/workflows/CI/badge.svg)](https://github.com/liinu-a/tic-tac-toe/actions)
+[![codecov](https://codecov.io/github/liinu-a/tic-tac-toe/graph/badge.svg?token=KOQ5TVM1L3)](https://codecov.io/github/liinu-a/tic-tac-toe)
+
 ## Documentation
 - [Project specification](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/project_specification.md)
 - [Implementation document](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/implementation_document.md)
