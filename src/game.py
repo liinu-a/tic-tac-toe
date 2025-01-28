@@ -66,6 +66,6 @@ class Game:
         """ 
         space["text"] = "X"
 
-        player_O.choose_move(r, c)
+        player_O.decide_move((r, c))
 
         """
