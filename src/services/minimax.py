@@ -1,30 +1,61 @@
-def minimax(grid, moves_to_evaluate, previous_move, depth, alpha, beta, turn):
+from .board import row_of_five, evaluate, update_moves_to_evaluate
 
-    if grid.row_of_five(previous_move):
-        return turn * (-1)
-    
+
+def minimax(board, moves_to_evaluate, previous_move, depth, alpha, beta, turn):
+    """Finds the optimal move. An implementation of the minimax algorithm with alpha-beta pruning.
+
+    Returns:
+        (int, (int, int)): The value of the optimal move and the move.
+    """
+
+    if row_of_five(board, previous_move):
+        value = -1 - depth if turn == 1 else 1 + depth
+        return (value, (-1, -1))
+
     if len(moves_to_evaluate) == 0:
-        return 0
-    
-    best_value = turn * (-1)
+        return (0, (-1, -1))
 
-    for move in moves_to_evaluate:
-        grid.apply_move(move, turn)
+    if depth == 0:
+        return (evaluate(board), (-1, -1))
 
-        # Update moves_to_evaluate
+    optimal = (1000000 * turn * (-1), (-1, -1))
 
-        value = minimax(grid, moves_to_evaluate, move, depth + 1, alpha, beta, turn * (-1))
+    if turn == 1:
+        for move in reversed(moves_to_evaluate):
+            row, col = move
+            board[row][col] = 1
 
-        grid.remove_move(move, turn)
-        
-        if turn == 1:
-            best_value = max(value, best_value)
-            alpha = max(value, alpha)
-        else:
-            best_value = min(value, best_value)
-            beta = min(value, beta)
+            new_mvs_to_eval = moves_to_evaluate[:]
+            update_moves_to_evaluate(new_mvs_to_eval, move, board)
 
-        if beta <= alpha:
-            break
+            val, _ = minimax(board, new_mvs_to_eval, move, depth - 1, alpha, beta, -1)
 
-    return best_value
+            board[row][col] = 0
+
+            if val > optimal[0]:
+                optimal = (val, move)
+            alpha = max(alpha, val)
+
+            if beta <= alpha:
+                break
+
+    else:
+        for move in reversed(moves_to_evaluate):
+            row, col = move
+            board[row][col] = -1
+
+            new_mvs_to_eval = moves_to_evaluate[:]
+            update_moves_to_evaluate(new_mvs_to_eval, move, board)
+
+            val, _ = minimax(board, new_mvs_to_eval, move, depth - 1, alpha, beta, 1)
+
+            board[row][col] = 0
+
+            if val < optimal[0]:
+                optimal = (val, move)
+            beta = min(beta, val)
+
+            if beta <= alpha:
+                break
+
+    return optimal
