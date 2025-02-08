@@ -14,11 +14,3 @@ The user provides input to the program by interacting with a GUI implemented wit
 
 ## Info for the course
 The code and documentation are written in english. The programming language chosen for this project is Python. I should be able to understand Python and JavaScript to such an extent that I can peer review projects written in them.
-
-## Sources
-Implementing the GUI with Tkinter
-- https://www.youtube.com/watch?v=xx0qmpuA-vM
-- https://ohjelmistotekniikka-hy.github.io/python/tkinter
-
-Minimax algorithm with alpha-beta pruning
-- https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning

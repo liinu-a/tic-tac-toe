@@ -2,7 +2,7 @@ def collect_moves_to_evaluate(board, move):
     """Creates a list of free squares at most two squares away from a move.
 
     Args:
-        board ([[int]]): The board that shows which squares are free.
+        board ([[int]]): The game board.
         move ((int, int)): The move around which the squares are collected.
 
     Returns:
@@ -25,6 +25,7 @@ def collect_moves_to_evaluate(board, move):
     ]
 
     return valid_moves
+
 
 def update_moves_to_evaluate(moves_to_evaluate, move_made, board):
     """Updates the list of moves that are evaluated in minimax.
@@ -52,18 +53,30 @@ def update_moves_to_evaluate(moves_to_evaluate, move_made, board):
         except ValueError:
             moves_to_evaluate.append(move)
 
-def row_of_five(board, includes_move):
-    row, col = includes_move
-    player = board[row][col]
+
+def row_of_five(board, contains_move, player):
+    """Determines if there is a row of five containing the given move.
+
+    Args:
+        board ([[int]]): The game board.
+        contains_move ((int, int)): The move included in the row.
+        player (int): Which player's row.
+
+    Returns:
+        Bool: True if row of five is found else False.
+    """
+
+    row, col = contains_move
     count = 1
 
+    # Vertical row
     row += 1
     while row < 20 and board[row][col] == player:
         row += 1
         count += 1
         if count >= 5:
             return True
-    row = includes_move[0] - 1
+    row = contains_move[0] - 1
     while row >= 0 and board[row][col] == player:
         row -= 1
         count += 1
@@ -72,14 +85,15 @@ def row_of_five(board, includes_move):
 
     count = 1
 
-    row = includes_move[0]
+    # Horizontal row
+    row = contains_move[0]
     col += 1
     while col < 20 and board[row][col] == player:
         col += 1
         count += 1
         if count >= 5:
             return True
-    col = includes_move[1] - 1
+    col = contains_move[1] - 1
     while col >= 0 and board[row][col] == player:
         col -= 1
         count += 1
@@ -88,16 +102,17 @@ def row_of_five(board, includes_move):
 
     count = 1
 
+    # Downward diagonal row
     row += 1
-    col = includes_move[1] + 1
+    col = contains_move[1] + 1
     while col < 20 > row and board[row][col] == player:
         row += 1
         col += 1
         count += 1
         if count >= 5:
             return True
-    row = includes_move[0] - 1
-    col = includes_move[1] - 1
+    row = contains_move[0] - 1
+    col = contains_move[1] - 1
     while col >= 0 <= row and board[row][col] == player:
         row -= 1
         col -= 1
@@ -107,16 +122,17 @@ def row_of_five(board, includes_move):
 
     count = 1
 
-    row = includes_move[0] + 1
-    col = includes_move[1] - 1
+    # Upward diagonal row
+    row = contains_move[0] + 1
+    col = contains_move[1] - 1
     while 0 <= col and 20 > row and board[row][col] == player:
         row += 1
         col -= 1
         count += 1
         if count >= 5:
             return True
-    row = includes_move[0] - 1
-    col = includes_move[1] + 1
+    row = contains_move[0] - 1
+    col = contains_move[1] + 1
     while col < 20 and 0 <= row and board[row][col] == player:
         row -= 1
         col += 1
@@ -128,4 +144,6 @@ def row_of_five(board, includes_move):
 
 
 def evaluate(board):
+    """Under work.
+    """
     return 0
