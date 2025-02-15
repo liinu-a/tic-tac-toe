@@ -1,6 +1,7 @@
 from tkinter import Button, DISABLED, NORMAL, messagebox
 import functools
 from ai import AI
+from services.board import row_of_five
 
 
 class Game:
@@ -11,6 +12,7 @@ class Game:
         player_o: The AI.
         board: Representation of the board used in calculations.
         board_gui: The GUI board.
+        count: Count of how many moves have been made.
     """
 
     def __init__(self, root):
@@ -18,6 +20,8 @@ class Game:
         self.player_o = AI()
         self.board = [[0 for _ in range(20)] for _ in range(20)]
         self.board_gui = []
+        self.count = 0
+
 
     def start(self):
         """Builds the GUI of the game.
@@ -39,6 +43,7 @@ class Game:
         reset = Button(self.root, text="reset", command=self.reset)
         reset.grid(row=20, column=0)
 
+
     def make_move(self, x_row, x_col):
         """Responds to the move made by the user (player X).
 
@@ -54,18 +59,27 @@ class Game:
 
         square["text"] = "X"
         self.board[x_row][x_col] = -1
+        self.count += 1
 
-        winner, (o_row, o_col) = self.player_o.decide_move(
-            (x_row, x_col), self.board)
-
-        if (o_row, o_col) != (-1, -1):
-            self.board_gui[o_row][o_col]["text"] = "O"
-            self.board[o_row][o_col] = 1
-
-        if winner == "tie":
+        if row_of_five(self.board, (x_row, x_col), -1):
+            self.game_ended("Player X wins!")
+            return
+        if self.count == 400:
             self.game_ended("It's a tie!")
-        elif winner in ("X", "O"):
-            self.game_ended(f"Player {winner} wins!")
+            return
+
+        o_row, o_col = self.player_o.decide_move((x_row, x_col), self.board)
+
+        self.board_gui[o_row][o_col]["text"] = "O"
+        self.board[o_row][o_col] = 1
+        self.count += 1
+
+        if row_of_five(self.board, (o_row, o_col), 1):
+            self.game_ended("Player O wins!")
+            return
+        if self.count == 400:
+            self.game_ended("It's a tie!")
+
 
     def game_ended(self, message):
         """Prevents the user from making moves. Displays a message about how the game concluded.
@@ -79,6 +93,7 @@ class Game:
                 square.config(state=DISABLED)
 
         messagebox.showinfo("The game has ended.", message)
+
 
     def reset(self):
         """Resets the game.

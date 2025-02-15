@@ -141,9 +141,3 @@ def row_of_five(board, contains_move, player):
             return True
 
     return False
-
-
-def evaluate(board):
-    """Under work.
-    """
-    return 0
