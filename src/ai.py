@@ -41,11 +41,11 @@ class AI:
             (int, (int, int)): The value of the optimal move and the move.
         """
 
-        if len(moves_to_evaluate) == 0:
-            return (0, None)
-
         if depth == 0:
             return (evaluate(board, turn), None)
+
+        if len(moves_to_evaluate) == 0:
+            return (0, None)
 
         optimal = (1000000000 * turn * (-1), None)
 
@@ -57,11 +57,15 @@ class AI:
                 if row_of_five(board, move, 1):
                     board[row][col] = 0
                     return (10000000, move)
+                
+                val = None
+                if depth == 1:
+                    val, _ = self.minimax(board, moves_to_evaluate, depth - 1, alpha, beta, -1)
+                else:
+                    new_mvs_to_eval = moves_to_evaluate[:]
+                    update_moves_to_evaluate(new_mvs_to_eval, move, board)
 
-                new_mvs_to_eval = moves_to_evaluate[:]
-                update_moves_to_evaluate(new_mvs_to_eval, move, board)
-
-                val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, -1)
+                    val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, -1)
 
                 board[row][col] = 0
 
@@ -80,10 +84,14 @@ class AI:
                     board[row][col] = 0
                     return (-10000000, move)
 
-                new_mvs_to_eval = moves_to_evaluate[:]
-                update_moves_to_evaluate(new_mvs_to_eval, move, board)
+                val = None
+                if depth == 1:
+                    val, _ = self.minimax(board, moves_to_evaluate, depth - 1, alpha, beta, 1)
+                else:
+                    new_mvs_to_eval = moves_to_evaluate[:]
+                    update_moves_to_evaluate(new_mvs_to_eval, move, board)
 
-                val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, 1)
+                    val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, 1)
 
                 board[row][col] = 0
 

@@ -6,7 +6,7 @@ def evaluate(board, cur_turn):
     player = None
 
     value = 0
-    best_for_cur_turn = winning_rows_for_next = 0
+    winning_rows_for_next = 0
     values = {
         0: 0,
         1: 1,
@@ -41,12 +41,10 @@ def evaluate(board, cur_turn):
                 if count == 4:
                     if player == cur_turn:
                         return 10000000 * cur_turn
-
+                    
                     winning_rows_for_next += 1
 
                 if winning_rows_for_next < 2:
-                    if player == cur_turn:
-                        best_for_cur_turn = max(best_for_cur_turn, count)
                     value += values[count] * player
 
                 count -= abs(row[start_col])
@@ -57,6 +55,8 @@ def evaluate(board, cur_turn):
 
     for col in range(20):
         count = 0
+        end_row = end_col = 0
+
         while end_row < 20 and board[end_row][col] == 0:
             end_row += 1
 
@@ -85,8 +85,6 @@ def evaluate(board, cur_turn):
                     winning_rows_for_next += 1
 
                 if winning_rows_for_next < 2:
-                    if player == cur_turn:
-                        best_for_cur_turn = max(best_for_cur_turn, count)
                     value += values[count] * player
 
                 count -= abs(board[start_row][col])
@@ -132,8 +130,6 @@ def evaluate(board, cur_turn):
                     winning_rows_for_next += 1
 
                 if winning_rows_for_next < 2:
-                    if player == cur_turn:
-                        best_for_cur_turn = max(best_for_cur_turn, count)
                     value += values[count] * player
 
                 count -= abs(board[start_row][start_col])
@@ -180,8 +176,6 @@ def evaluate(board, cur_turn):
                     winning_rows_for_next += 1
 
                 if winning_rows_for_next < 2:
-                    if player == cur_turn:
-                        best_for_cur_turn = max(best_for_cur_turn, count)
                     value += values[count] * player
 
                 count -= abs(board[start_row][start_col])
@@ -228,8 +222,6 @@ def evaluate(board, cur_turn):
                     winning_rows_for_next += 1
 
                 if winning_rows_for_next < 2:
-                    if player == cur_turn:
-                        best_for_cur_turn = max(best_for_cur_turn, count)
                     value += values[count] * player
 
                 count -= abs(board[start_row][start_col])
@@ -276,8 +268,6 @@ def evaluate(board, cur_turn):
                     winning_rows_for_next += 1
 
                 if winning_rows_for_next < 2:
-                    if player == cur_turn:
-                        best_for_cur_turn = max(best_for_cur_turn, count)
                     value += values[count] * player
 
                 count -= abs(board[start_row][start_col])
@@ -290,6 +280,4 @@ def evaluate(board, cur_turn):
     if winning_rows_for_next >= 2:
         return 10000000 * next_turn
 
-    value -= values[best_for_cur_turn] * cur_turn
-    value += values[best_for_cur_turn + 1] * cur_turn
     return value
