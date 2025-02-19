@@ -1,5 +1,4 @@
 import unittest
-import random
 from services.board import collect_moves_to_evaluate, update_moves_to_evaluate, row_of_five
 
 

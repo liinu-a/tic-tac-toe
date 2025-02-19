@@ -62,11 +62,11 @@ class AI:
             (int, (int, int)): The value of the optimal move and the move.
         """
 
-        if depth == 0:
-            return (self.evaluate(board, turn), None)
-
         if len(moves_to_evaluate) == 0:
             return (0, None)
+
+        if depth == 0:
+            return (self.evaluate(board, turn), None)
 
         optimal = (100000000000 * turn * (-1), None)
 
@@ -87,7 +87,6 @@ class AI:
                 else:
                     new_mvs_to_eval = moves_to_evaluate[:]
                     update_moves_to_evaluate(new_mvs_to_eval, move, board)
-
                     val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, -1)
 
                 board[row][col] = 0
@@ -116,7 +115,6 @@ class AI:
                 else:
                     new_mvs_to_eval = moves_to_evaluate[:]
                     update_moves_to_evaluate(new_mvs_to_eval, move, board)
-
                     val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, 1)
 
                 board[row][col] = 0
