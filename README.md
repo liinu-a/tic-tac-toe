@@ -15,4 +15,5 @@
 - [Report week 3](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/weekly_reports/report_week3.md)
 - [Report week 4](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/weekly_reports/report_week4.md)
 - [Report week 5](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/weekly_reports/report_week5.md)
+- [Report week 6](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/weekly_reports/report_week6.md)
 

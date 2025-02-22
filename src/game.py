@@ -1,7 +1,7 @@
 from tkinter import Button, DISABLED, NORMAL, messagebox
 import functools
 from ai import AI
-from services.board import row_of_five
+from board import Board
 
 
 class Game:
@@ -17,10 +17,10 @@ class Game:
 
     def __init__(self, root):
         self.root = root
-        self.player_o = AI()
-        self.board = [[0 for _ in range(20)] for _ in range(20)]
         self.board_gui = []
         self.count = 0
+        self.player_o = AI()
+        self.board = Board()
 
 
     def start(self):
@@ -54,16 +54,17 @@ class Game:
 
         square = self.board_gui[x_row][x_col]
 
-        if square["text"] != " " or self.board[x_row][x_col]:
+        if square["text"] != " ":
             return
 
         square["text"] = "X"
-        self.board[x_row][x_col] = -1
+        self.board.mark_board((x_row, x_col), -1)
         self.count += 1
 
-        if row_of_five(self.board, (x_row, x_col), -1):
+        if self.board.row_of_five((x_row, x_col), -1):
             self.game_ended("Player X wins!")
             return
+        
         if self.count == 400:
             self.game_ended("It's a tie!")
             return
@@ -71,12 +72,13 @@ class Game:
         o_row, o_col = self.player_o.decide_move((x_row, x_col), self.board)
 
         self.board_gui[o_row][o_col]["text"] = "O"
-        self.board[o_row][o_col] = 1
+        self.board.mark_board((o_row, o_col), 1)
         self.count += 1
 
-        if row_of_five(self.board, (o_row, o_col), 1):
+        if self.board.row_of_five((o_row, o_col), 1):
             self.game_ended("Player O wins!")
             return
+        
         if self.count == 400:
             self.game_ended("It's a tie!")
 
@@ -100,9 +102,9 @@ class Game:
         """
 
         self.player_o = AI()
-        self.board = [[0 for _ in range(20)] for _ in range(20)]
+        self.board = Board()
 
         for row in self.board_gui:
             for square in row:
-                square.config(state=NORMAL)
                 square["text"] = " "
+                square.config(state=NORMAL)
