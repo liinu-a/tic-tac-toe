@@ -1,3 +1,6 @@
+import time
+
+
 class AI:
     """Class that manages the decition making of the AI.
 
@@ -36,13 +39,25 @@ class AI:
         self.update_moves_to_evaluate(self.moves_to_evaluate, user_move, board)
         self.updated_rows(user_move)
 
-        _, ai_move = self.minimax(
-            board, self.moves_to_evaluate, 4, -100000000000, 100000000000, 1)
+        best_val, best_move = 0, None
+        self.cur_depth = 1
+        self.table = {}
+        self.time_start = time.time()
 
-        self.update_moves_to_evaluate(self.moves_to_evaluate, ai_move, board)
-        self.updated_rows(ai_move)
+        while time.time() - self.time_start < 1 or self.cur_depth < 4:
+            best_val, best_move = self.minimax(
+                board, self.moves_to_evaluate, self.cur_depth, -1000000000000, 1000000000000, 1, "")
+            self.moves_to_evaluate.append(
+                self.moves_to_evaluate.pop(
+                    self.moves_to_evaluate.index(best_move)
+                )
+            )
+            self.cur_depth += 1
+        
+        self.update_moves_to_evaluate(self.moves_to_evaluate, best_move, board)
+        self.updated_rows(best_move)
 
-        return ai_move
+        return best_val, best_move
 
 
     def update_moves_to_evaluate(self, moves_to_evaluate, move_made, board):
@@ -71,77 +86,124 @@ class AI:
                 moves_to_evaluate.append(move)
 
 
-    def minimax(self, board, moves_to_evaluate, depth, alpha, beta, turn):
+    def minimax(self, board, moves_to_evaluate, depth, alpha, beta, turn, table_key):
         """Finds the optimal move. An implementation of the minimax algorithm with alpha-beta pruning.
 
         Returns:
             (int, (int, int)): The value of the optimal move and the move.
+
         """
 
-        if len(moves_to_evaluate) == 0:
-            return (0, None)
+        if self.table.get(table_key) is None:
+            self.table[table_key] = [None, None, -1]
 
-        if depth == 0:
-            return (self.evaluate(board, turn), None)
+        val, last_best_move, update_depth = self.table[table_key]
 
-        optimal = (100000000000 * turn * (-1), None)
+        if update_depth == self.cur_depth:
+            return (val, last_best_move)
+
+        if last_best_move:
+            moves_to_evaluate.append(
+                moves_to_evaluate.pop(
+                    moves_to_evaluate.index(last_best_move)
+                )
+            )
+
+        optimal = (1000000000000 * turn * (-1), None)
 
         if turn == 1:
             for move in reversed(moves_to_evaluate):
                 board.mark_board(move, 1)
 
                 if board.row_of_five(move, 1):
+                    self.table[table_key] = [100000000000, move, self.cur_depth]
                     board.mark_board(move, 0)
-                    return (1000000000, move)
+                    return (100000000000, move)
 
-                self.updated_rows(move)
-
-                val = None
-                if depth == 1:
-                    val, _ = self.minimax(board, moves_to_evaluate, depth - 1, alpha, beta, -1)
-                else:
-                    new_mvs_to_eval = moves_to_evaluate[:]
-                    self.update_moves_to_evaluate(new_mvs_to_eval, move, board)
-                    val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, -1)
+                val = 0
+                if len(moves_to_evaluate) > 1:
+                    self.updated_rows(move)
+                    new_table_key = self.get_table_key(table_key, "+", f"{move[0]:02d}", f"{move[1]:02d}")
+                    
+                    if depth == 1:
+                        if self.table.get(new_table_key):
+                            val = self.table[new_table_key][0]
+                        else:
+                            val = self.evaluate(board, -1)
+                            self.table[new_table_key] = [val, None, -1]
+                    else:
+                        new_moves_to_evaluate = moves_to_evaluate[:]
+                        self.update_moves_to_evaluate(new_moves_to_evaluate, move, board)
+                        val, _ = self.minimax(
+                            board, new_moves_to_evaluate, depth - 1, alpha, beta, -1, new_table_key)
+                    
+                    self.updated_rows(move)
 
                 board.mark_board(move, 0)
-                self.updated_rows(move)
 
                 if val > optimal[0]:
                     optimal = (val, move)
                 alpha = max(alpha, val)
 
-                if beta <= alpha:
+                if beta <= alpha or time.time() - self.time_start >= 1 and self.cur_depth > 4:
                     break
         else:
             for move in reversed(moves_to_evaluate):
                 board.mark_board(move, -1)
 
                 if board.row_of_five(move, -1):
+                    self.table[table_key] = [-100000000000, move, self.cur_depth]
                     board.mark_board(move, 0)
-                    return (-1000000000, move)
-                
-                self.updated_rows(move)
+                    return (-100000000000, move)
 
-                val = None
-                if depth == 1:
-                    val, _ = self.minimax(board, moves_to_evaluate, depth - 1, alpha, beta, 1)
-                else:
-                    new_mvs_to_eval = moves_to_evaluate[:]
-                    self.update_moves_to_evaluate(new_mvs_to_eval, move, board)
-                    val, _ = self.minimax(board, new_mvs_to_eval, depth - 1, alpha, beta, 1)
+                val = 0
+                if len(moves_to_evaluate) > 1:
+                    self.updated_rows(move)
+                    new_table_key = self.get_table_key(table_key, "-", f"{move[0]:02d}", f"{move[1]:02d}")
+                    
+                    if depth == 1:
+                        if self.table.get(new_table_key):
+                            val = self.table[new_table_key][0]
+                        else:
+                            val = self.evaluate(board, 1)
+                            self.table[new_table_key] = [val, None, -1]
+                    else:
+                        new_moves_to_evaluate = moves_to_evaluate[:]
+                        self.update_moves_to_evaluate(new_moves_to_evaluate, move, board)
+                        val, _ = self.minimax(
+                            board, new_moves_to_evaluate, depth - 1, alpha, beta, 1, new_table_key)
+                    
+                    self.updated_rows(move)
 
                 board.mark_board(move, 0)
-                self.updated_rows(move)
 
                 if val < optimal[0]:
                     optimal = (val, move)
                 beta = min(beta, val)
 
-                if beta <= alpha:
+                if beta <= alpha or time.time() - self.time_start >= 1 and self.cur_depth > 4:
                     break
 
+        self.table[table_key] = [optimal[0], optimal[1], self.cur_depth]
         return optimal
+
+
+    def get_table_key(self, prev_key, player, row, col):
+        tb_key = ""
+        for i in range(1, len(prev_key), 5):
+            if prev_key[i:i + 2] == row:
+                for j in range(i + 2, len(prev_key), 5):
+                    if prev_key[j:j + 2] > col or prev_key[j - 2:j] > row:
+                        break
+                    tb_key += prev_key[j - 3:j + 2]
+                break
+
+            if prev_key[i:i + 2] > row:
+                break
+            tb_key += prev_key[i - 1:i + 4]
+
+        tb_key += player + row + col + prev_key[len(tb_key): ]
+        return tb_key
 
 
     def updated_rows(self, move):

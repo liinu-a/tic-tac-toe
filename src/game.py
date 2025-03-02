@@ -69,7 +69,7 @@ class Game:
             self.game_ended("It's a tie!")
             return
 
-        o_row, o_col = self.player_o.decide_move((x_row, x_col), self.board)
+        _, (o_row, o_col) = self.player_o.decide_move((x_row, x_col), self.board)
 
         self.board_gui[o_row][o_col]["text"] = "O"
         self.board.mark_board((o_row, o_col), 1)
