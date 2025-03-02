@@ -11,6 +11,7 @@ class AI:
     def __init__(self):
         self.moves_to_evaluate = []
         self.board_eval = 0
+        self.table = {}
 
         self.updated_horizontals = set()
         self.horizontal_vals = [0] * 20
@@ -26,36 +27,32 @@ class AI:
 
 
     def decide_move(self, user_move, board):
-        """Gets the move of the AI and reports the winner.
-
-        Args:
-            user_move ((int, int)): The row and column of the move to which the AI responds.
-            board ([[int]]): The game board.
-
-        Returns:
-            (int, (int, int)): 
-        """
-
         self.update_moves_to_evaluate(self.moves_to_evaluate, user_move, board)
         self.updated_rows(user_move)
 
         best_val, best_move = 0, None
-        self.cur_depth = 1
-        self.table = {}
+        self.depth = 1
+        self.time_expired = False
         self.time_start = time.time()
 
-        while time.time() - self.time_start < 1 or self.cur_depth < 4:
-            best_val, best_move = self.minimax(
-                board, self.moves_to_evaluate, self.cur_depth, -1000000000000, 1000000000000, 1, "")
+        while time.time() - self.time_start < 2 or self.depth < 4:
+            val, move = self.minimax(
+                board, self.moves_to_evaluate, self.depth, -1000000000000, 1000000000000, 1, "")
+            
+            if self.time_expired:
+                break
+
+            best_val, best_move = val, move
             self.moves_to_evaluate.append(
                 self.moves_to_evaluate.pop(
-                    self.moves_to_evaluate.index(best_move)
+                    self.moves_to_evaluate.index(move)
                 )
             )
-            self.cur_depth += 1
+            self.depth += 1
         
         self.update_moves_to_evaluate(self.moves_to_evaluate, best_move, board)
         self.updated_rows(best_move)
+        self.table = {}
 
         return best_val, best_move
 
@@ -95,12 +92,9 @@ class AI:
         """
 
         if self.table.get(table_key) is None:
-            self.table[table_key] = [None, None, -1]
+            self.table[table_key] = None
 
-        val, last_best_move, update_depth = self.table[table_key]
-
-        if update_depth == self.cur_depth:
-            return (val, last_best_move)
+        last_best_move = self.table[table_key]
 
         if last_best_move:
             moves_to_evaluate.append(
@@ -113,27 +107,27 @@ class AI:
 
         if turn == 1:
             for move in reversed(moves_to_evaluate):
+                if time.time() - self.time_start >= 2 and self.depth > 4:
+                    self.time_expired = True
+                    return (0, None)
+
                 board.mark_board(move, 1)
 
                 if board.row_of_five(move, 1):
-                    self.table[table_key] = [100000000000, move, self.cur_depth]
+                    self.table[table_key] = move
                     board.mark_board(move, 0)
                     return (100000000000, move)
 
                 val = 0
                 if len(moves_to_evaluate) > 1:
                     self.updated_rows(move)
-                    new_table_key = self.get_table_key(table_key, "+", f"{move[0]:02d}", f"{move[1]:02d}")
                     
                     if depth == 1:
-                        if self.table.get(new_table_key):
-                            val = self.table[new_table_key][0]
-                        else:
-                            val = self.evaluate(board, -1)
-                            self.table[new_table_key] = [val, None, -1]
+                        val = self.evaluate(board, -1)
                     else:
                         new_moves_to_evaluate = moves_to_evaluate[:]
                         self.update_moves_to_evaluate(new_moves_to_evaluate, move, board)
+                        new_table_key = self.get_table_key(table_key, "+", f"{move[0]:02d}", f"{move[1]:02d}")
                         val, _ = self.minimax(
                             board, new_moves_to_evaluate, depth - 1, alpha, beta, -1, new_table_key)
                     
@@ -144,32 +138,31 @@ class AI:
                 if val > optimal[0]:
                     optimal = (val, move)
                 alpha = max(alpha, val)
-
-                if beta <= alpha or time.time() - self.time_start >= 1 and self.cur_depth > 4:
+                if beta <= alpha:
                     break
         else:
             for move in reversed(moves_to_evaluate):
+                if time.time() - self.time_start >= 2 and self.depth > 4:
+                    self.time_expired = True
+                    return (0, None)
+                
                 board.mark_board(move, -1)
 
                 if board.row_of_five(move, -1):
-                    self.table[table_key] = [-100000000000, move, self.cur_depth]
+                    self.table[table_key] = move
                     board.mark_board(move, 0)
                     return (-100000000000, move)
 
                 val = 0
                 if len(moves_to_evaluate) > 1:
                     self.updated_rows(move)
-                    new_table_key = self.get_table_key(table_key, "-", f"{move[0]:02d}", f"{move[1]:02d}")
                     
                     if depth == 1:
-                        if self.table.get(new_table_key):
-                            val = self.table[new_table_key][0]
-                        else:
-                            val = self.evaluate(board, 1)
-                            self.table[new_table_key] = [val, None, -1]
+                        val = self.evaluate(board, 1)
                     else:
                         new_moves_to_evaluate = moves_to_evaluate[:]
                         self.update_moves_to_evaluate(new_moves_to_evaluate, move, board)
+                        new_table_key = self.get_table_key(table_key, "-", f"{move[0]:02d}", f"{move[1]:02d}")
                         val, _ = self.minimax(
                             board, new_moves_to_evaluate, depth - 1, alpha, beta, 1, new_table_key)
                     
@@ -180,11 +173,10 @@ class AI:
                 if val < optimal[0]:
                     optimal = (val, move)
                 beta = min(beta, val)
-
-                if beta <= alpha or time.time() - self.time_start >= 1 and self.cur_depth > 4:
+                if beta <= alpha:
                     break
 
-        self.table[table_key] = [optimal[0], optimal[1], self.cur_depth]
+        self.table[table_key] = optimal[1]
         return optimal
 
 
