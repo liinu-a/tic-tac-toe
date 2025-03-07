@@ -133,11 +133,11 @@ class TestAI(unittest.TestCase):
         self.ai.horizontal_vals[3] = self.ai.board_val = -4
 
         self.board.mark_board((3, 10), -1)
-        _, ai_move = self.ai.decide_move((3, 6), self.board)
+        _, ai_move = self.ai.decide_move((3, 10), self.board)
 
         self.assertTrue(ai_move in {(3, 6), (3, 9), (3, 11)})
 
-    def test_block_two_of_three_threat(self):
+    def test_block_double_three_threat(self):
         for move in [(5, 4), (4, 4), (3, 5)]:
             self.board.mark_board(move, -1)
 
@@ -170,10 +170,10 @@ class TestAI(unittest.TestCase):
         self.board.mark_board((6, 8), -1)
         evalue, ai_move = self.ai.decide_move((6, 8), self.board)
 
-        self.assertTrue(ai_move in {(1, 3), (5, 7)})
+        self.assertTrue(ai_move, (1, 3))
         self.assertEqual(evalue, 100000000000)
 
-    def test_form_double_three_to_win(self):
+    def test_form_double_three(self):
         for move in [(5, 10), (6, 9), (8, 9), (9, 10)]:
             self.board.mark_board(move, 1)
 
@@ -209,3 +209,27 @@ class TestAI(unittest.TestCase):
 
         self.assertEqual(table_key,
             """-0000+0003-0100+0101-0302+0502-0511+0612+0703-0804-1005-1013-1014+1110+1111+1515+1607-1609-1701+1704+1719-1909-1917+1919""")
+
+    def test_searches_leading_to_same_game_state_get_same_table_key(self):
+        moves1 = [
+            ["+", "03", "01"], ["-", "08", "02"], ["+", "03", "00"], ["-", "03", "19"],
+            ["+", "05", "04"], ["-", "00", "00"], ["+", "08", "00"], ["-", "00", "19"],
+            ["+", "05", "05"], ["-", "09", "10"], ["+", "08", "01"], ["-", "08", "03"]
+        ]
+        table_key1 = ""
+        for move in moves1:
+            table_key1 = self.ai.get_table_key(table_key1, move[0], move[1], move[2])
+
+        moves2 = [
+            ["-", "08", "02"], ["-", "09", "10"], ["+", "03", "00"], ["+", "03", "01"],
+            ["-", "00", "19"], ["+", "05", "04"], ["-", "00", "00"], ["+", "08", "00"],
+            ["+", "05", "05"], ["+", "08", "01"], ["-", "08", "03"], ["-", "03", "19"]
+        ]
+        table_key2 = ""
+        for move in moves2:
+            table_key2 = self.ai.get_table_key(table_key2, move[0], move[1], move[2])
+
+        self.assertTrue(
+            table_key1 == "-0000-0019+0300+0301-0319+0504+0505+0800+0801-0802-0803-0910"
+            and table_key1 == table_key2
+        )
