@@ -9,10 +9,10 @@ class Game:
 
     Attributes:
         root: The root window of the game.
-        player_o: The AI.
-        board: Representation of the board used in calculations.
         board_gui: The GUI board.
-        count: Count of how many moves have been made.
+        count: A count of how many moves have been made thus far.
+        player_o: The AI.
+        board: The board used in calculations.
     """
 
     def __init__(self, root):
@@ -40,12 +40,12 @@ class Game:
             for j, square in enumerate(board_row):
                 square.grid(row=i, column=j)
 
-        reset = Button(self.root, text="reset", command=self.reset)
-        reset.grid(row=20, column=0)
+        reset = Button(self.root, text="RESET", command=self.reset)
+        reset.grid(row=20, column=0, columnspan=2)
 
 
     def make_move(self, x_row, x_col):
-        """Responds to the move made by the user (player X).
+        """Responds to the user making a move (player X).
 
         Args:
             x_row (int): The row of the user's move.
@@ -58,6 +58,7 @@ class Game:
             return
 
         square["text"] = "X"
+        self.root.update_idletasks()
         self.board.mark_board((x_row, x_col), -1)
         self.count += 1
 
@@ -84,7 +85,9 @@ class Game:
 
 
     def game_ended(self, message):
-        """Prevents the user from making moves. Displays a message about how the game concluded.
+        """Prevents the user from making moves once the game ends. 
+        
+        Displays a message about how the game concluded.
 
         Args:
             message (str): Announces either the winner or a tie.

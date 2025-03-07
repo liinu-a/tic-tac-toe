@@ -53,24 +53,24 @@ class TestAI(unittest.TestCase):
 
 
     def test_adding_to_updated_rows(self):
-        self.ai.updated_rows((5, 4))
+        self.ai.changed_rows((5, 4))
 
         self.assertSetEqual(self.ai.updated_horizontals, {5})
         self.assertSetEqual(self.ai.updated_verticals, {4})
         self.assertSetEqual(self.ai.updated_downward_diags, {20})
         self.assertSetEqual(self.ai.updated_upward_diags, {9})
 
-        self.ai.updated_rows((6, 4))
-        self.ai.updated_rows((7, 6))
-        self.ai.updated_rows((5, 13))
+        self.ai.changed_rows((6, 4))
+        self.ai.changed_rows((7, 6))
+        self.ai.changed_rows((5, 13))
 
         self.assertSetEqual(self.ai.updated_horizontals, {5, 6, 7})
         self.assertSetEqual(self.ai.updated_verticals, {4, 6, 13})
         self.assertSetEqual(self.ai.updated_downward_diags, {20, 21, 11})
         self.assertSetEqual(self.ai.updated_upward_diags, {9, 10, 13, 18})
 
-        self.ai.updated_rows((18, 0))
-        self.ai.updated_rows((16, 19))
+        self.ai.changed_rows((18, 0))
+        self.ai.changed_rows((16, 19))
 
         self.assertSetEqual(self.ai.updated_horizontals, {5, 6, 7, 18, 16})
         self.assertSetEqual(self.ai.updated_verticals, {4, 6, 13, 0, 19})
@@ -81,11 +81,11 @@ class TestAI(unittest.TestCase):
     def test_board_evaluation(self):
         for move in [(3, 6), (4, 5), (5, 5), (5, 6), (6, 6), (6, 7)]:
             self.board.mark_board(move, 1)
-            self.ai.updated_rows(move)
+            self.ai.changed_rows(move)
 
         for move in [(2, 4), (2, 6), (2, 7), (1, 7), (3, 5)]:
             self.board.mark_board(move, -1)
-            self.ai.updated_rows(move)
+            self.ai.changed_rows(move)
 
         self.ai.evaluate(self.board, -1)
 
@@ -104,12 +104,12 @@ class TestAI(unittest.TestCase):
         self.assertEqual(self.ai.upward_diags_vals[8], -41)
         self.assertEqual(self.ai.upward_diags_vals[9], 1)
 
-        self.assertEqual(self.ai.board_eval, 9)
+        self.assertEqual(self.ai.board_val, 9)
 
         self.board.mark_board((4, 4), -1)
-        self.ai.updated_rows((4, 4))
+        self.ai.changed_rows((4, 4))
         self.board.mark_board((7, 8), 1)
-        self.ai.updated_rows((7, 8))
+        self.ai.changed_rows((7, 8))
 
         self.ai.evaluate(self.board, -1)
 
@@ -118,7 +118,7 @@ class TestAI(unittest.TestCase):
         self.assertEqual(self.ai.downward_diags_vals[19], 1)
         self.assertEqual(self.ai.upward_diags_vals[8], -100000000)
 
-        self.assertEqual(self.ai.board_eval, -99979976)
+        self.assertEqual(self.ai.board_val, -99979976)
 
 
     def test_block_broken_three_threat(self):
@@ -130,7 +130,7 @@ class TestAI(unittest.TestCase):
             (4, 6), (1, 6), (1, 10), (5, 6), (5, 10), (1, 8), (3, 6), (3, 10),
             (5, 8), (2, 7), (2, 9), (4, 7), (4, 9), (2, 8), (3, 9), (4, 8)
         ]
-        self.ai.horizontal_vals[3] = self.ai.board_eval = -4
+        self.ai.horizontal_vals[3] = self.ai.board_val = -4
 
         self.board.mark_board((3, 10), -1)
         _, ai_move = self.ai.decide_move((3, 6), self.board)
@@ -148,7 +148,7 @@ class TestAI(unittest.TestCase):
             (4, 6), (2, 5), (3, 4), (3, 6), (4, 5)
         ]
         self.ai.vertical_vals[4] = self.ai.upward_diags_vals[8] = -4
-        self.ai.board_eval = -8
+        self.ai.board_val = -8
 
         self.board.mark_board((3, 6), -1)
         _, ai_move = self.ai.decide_move((3, 6), self.board)
@@ -165,7 +165,7 @@ class TestAI(unittest.TestCase):
             (6, 8), (2, 6), (4, 4), (4, 8), (6, 6), (3, 7), (5, 5), (5, 7),
             (3, 6), (4, 5), (4, 7), (5, 6)
         ]
-        self.ai.downward_diags_vals[17] = self.ai.board_eval = 61
+        self.ai.downward_diags_vals[17] = self.ai.board_val = 61
 
         self.board.mark_board((6, 8), -1)
         evalue, ai_move = self.ai.decide_move((6, 8), self.board)
@@ -187,7 +187,7 @@ class TestAI(unittest.TestCase):
         self.ai.downward_diags_vals[18] = self.ai.upward_diags_vals[15] = 4
         self.ai.vertical_vals[9] = 3
         self.ai.vertical_vals[9] = 1
-        self.ai.board_eval = 12
+        self.ai.board_val = 12
 
         self.board.mark_board((3, 12), -1)
         self.assertEqual(self.ai.decide_move((3, 12), self.board)[1], (7, 8))

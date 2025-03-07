@@ -1,4 +1,13 @@
 class Board():
+    """A class for the board that is used for calculations.
+
+    Attributes:
+        board: The main board/the horizontal rows of the board.
+        board_vertical: The vertical rows of the board.
+        board_downward_diag: The downward diagonal rows of the board.
+        board_upward_diag: The upward diagonal rows of the board.
+    """
+
     def __init__(self):
         self.board = [[0 for _ in range(20)] for _ in range(20)]
         self.board_vertical = [[0 for _ in range(20)] for _ in range(20)]
@@ -13,63 +22,78 @@ class Board():
             self.board_upward_diag.append([0] * i)
 
 
-    def mark_board(self, move, player):
-        row, col = move
-        self.board[row][col] = player
-        self.board_vertical[col][row] = player
+    def mark_board(self, square, val):
+        """Marks the board and its variations with a value.
+
+        Args:
+            square ((int, int)): The square to be marked.
+            val (int): The value the square gets marked with, either -1, 0 or 1.
+        """
+
+        row, col = square
+        self.board[row][col] = val
+        self.board_vertical[col][row] = val
 
         row_diag = 19 + row - col
-        self.board_downward_diag[row_diag][col if row_diag > 19 else row] = player
+        self.board_downward_diag[row_diag][col if row_diag > 19 else row] = val
 
         row_diag = row + col
-        self.board_upward_diag[row_diag][19 - col if row_diag > 19 else row] = player
+        self.board_upward_diag[row_diag][19 - col if row_diag > 19 else row] = val
 
 
     def row_of_five(self, contains_move, player):
-        """Determines if there is a row of five containing the given move.
+        """Determines whether a player has gotten a row of five that includes a given move.
 
         Args:
             contains_move ((int, int)): The move included in the row.
-            player (int): Which player's row.
+            player (int): The player whose row it should be.
 
         Returns:
             Bool: True if row of five is found else False.
         """
 
         row, col = contains_move
-
-        if self.check_row_of_five(row, col, self.board, player):
+        if self.check_row_of_five(col, self.board[row], player):
             return True
-        if self.check_row_of_five(col, row, self.board_vertical, player):
+        if self.check_row_of_five(row, self.board_vertical[col], player):
             return True
 
         row_diag = 19 + row - col
         col_diag = col if row_diag > 19 else row
-
-        if self.check_row_of_five(row_diag, col_diag, self.board_downward_diag, player):
+        if self.check_row_of_five(col_diag, self.board_downward_diag[row_diag], player):
             return True
 
         row_diag = row + col
         col_diag = 19 - col if row_diag > 19 else row
-
-        if self.check_row_of_five(row_diag, col_diag, self.board_upward_diag, player):
+        if self.check_row_of_five(col_diag, self.board_upward_diag[row_diag], player):
             return True
 
         return False
 
 
-    def check_row_of_five(self, row, col, board, player):
+    def check_row_of_five(self, col, row, player):
+        """Checks a single row for a row of five.
+
+        Args:
+            row ([int]): The row to be checked of the board.
+            col (int): The column of the square that must be included in the row of five.
+            player (int): The player whose row of five it should be.
+
+        Returns:
+            Bool: True if found else False.
+        """
+
         count = 1
-        right_col = col + 1
-        while right_col < len(board[row]) and board[row][right_col] == player:
-            right_col += 1
+        right = col + 1
+        while right < len(row) and row[right] == player:
+            right += 1
             count += 1
             if count >= 5:
                 return True
 
-        left_col = col - 1
-        while left_col >= 0 and board[row][left_col] == player:
-            left_col -= 1
+        left = col - 1
+        while left >= 0 and row[left] == player:
+            left -= 1
             count += 1
             if count >= 5:
                 return True
@@ -85,7 +109,7 @@ class Board():
             move ((int, int)): The move around which the squares are collected.
 
         Returns:
-            [(int, int)]: The list of squares, represented by their coordinates on the board (row, column).
+            [(int, int)]: The list of squares, represented by their coordinates on the board.
         """
 
         r, c = move
@@ -97,10 +121,7 @@ class Board():
                 (rmm, cmm), (rmm, cpp), (rpp, cmm), (rpp, cpp), (rmm, c), (r, cmm), (r, cpp), (rpp, c),
                 (rm, cm), (rm, cp), (rp, cm), (rp, cp), (rm, c), (r, cm), (r, cp), (rp, c)
             ]
-            if (
-                0 <= row < 20 > col >= 0
-                and self.board[row][col] == 0
-            )
+            if 0 <= row < 20 > col >= 0 and self.board[row][col] == 0
         ]
 
         return valid_moves
