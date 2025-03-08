@@ -26,7 +26,7 @@ Form a double of open ended threes:
 Other test cases:
 - The list of moves to be evaluated in minimax is updated correctly when proceeding to explore the next move, i.e., only free squares within the board boundaries are added to the list and those already in the list are moved to the back for prioritization reasons.
 - The value of a row is calculated correctly, whether the row is valueless, has some value, or the player whose turn it is has the opportunity to make a row of five and win.
-- When a move is made or tried in minimax, the rows that include the marked square are added to the sets, which keep track of any rows that may have changed.
+- When a move is made or tried in minimax, the rows that include the marked square are correctly added to the sets, which keep track of any rows that may have changed.
 - When the game state is evaluated by the evaluation function, the value of the board as well as the values of the changed rows are updated correctly and the evaluation function returns the updated value of the board.
 - The table key of a game state is generated correctly. If two game states are the same, the only difference being the order in which the moves leading to it were made, then they receive the same table key.
 
@@ -41,7 +41,14 @@ The test cases verify the following:
 During the development of the project, I have test played the game multiple times. The game does not appear to have any problems and the AI plays fairly well. Additionally, I tested the depth of the search tree. The depth will always be at least 4, but can reach 5 at times.
 
 ## Running the tests
-After installing the project, activating the virtual environment and navigating to the root directory, the tests can be run and the coverage collected with the command:  
-`coverage run --branch -m pytest src`.  
-The coverage report can now be printed with the command:  
-`coverage report -m`.
+After installing the project, activating the virtual environment and navigating to the root directory, the tests can be run and the coverage collected with the command
+
+```bash
+coverage run --branch -m pytest src
+```
+
+The coverage report can now be printed with the command
+
+```bash
+coverage report -m
+```
