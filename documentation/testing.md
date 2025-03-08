@@ -9,7 +9,7 @@ Tests run 7.3.2025.
 For some reason, there are rows that are definitely covered by the tests, but appear as uncovered in the coverage report.
 
 ### Testing the AI class
-Tests have been written to test the ability of the AI to choose the right move. In the images below, the -1s are moves made by the user and the 1s moves made by the AI. No moves other than the ones visible in the images have been made. The game states in the images are not realistic, but intented for testing the AI. It is the AI's turn to decide its next move, which should and is tested be one of the squares highlighted in red.
+Tests have been written to test the ability of the AI to choose the right move. In the images below, the -1s are moves made by the user and the 1s moves made by the AI. No moves other than the ones visible in the images have been made. The game states in the images are not realistic, but intented for testing the AI. It is the AI's turn to decide its next move, which should and is tested to be one of the squares highlighted in red.
 
 Preventing the user from winning by preventing them from forming an open ended row of four:  
 ![A potential open ended four for the user](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/broken_three_threat.png)
@@ -32,7 +32,7 @@ Other test cases:
 
 ### Testing the Board class
 The test cases verify the following:
-- When a move is made, all the board variations are marked correctly.
+- When a square is marked, all the board variations are marked correctly.
 - A row of five is found if one exists in a horizontal, vertical or upward/downward diagonal row. In the game state below, a row of five containing the move highlighted in red is not found for player 1;  
 ![No row of five found](https://github.com/liinu-a/tic-tac-toe/blob/main/documentation/no_row_of_five.png)
 - The squares at most two squares away from a move are collected correctly, i.e., they are unmarked and within the board boundaries.
@@ -43,5 +43,5 @@ During the development of the project, I have test played the game multiple time
 ## Running the tests
 After installing the project, activating the virtual environment and navigating to the root directory, the tests can be run and the coverage collected with the command:  
 `coverage run --branch -m pytest src`.  
-The coverage report can now be printed with the command:
+The coverage report can now be printed with the command:  
 `coverage report -m`.
