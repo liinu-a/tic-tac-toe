@@ -87,7 +87,7 @@ class TestAI(unittest.TestCase):
             self.board.mark_board(move, -1)
             self.ai.changed_rows(move)
 
-        self.ai.evaluate(self.board, -1)
+        self.assertEqual(self.ai.evaluate(self.board, -1), 9)
 
         self.assertEqual(self.ai.horizontal_vals[2], -43)
         self.assertEqual(self.ai.horizontal_vals[5], 4)
@@ -111,7 +111,7 @@ class TestAI(unittest.TestCase):
         self.board.mark_board((7, 8), 1)
         self.ai.changed_rows((7, 8))
 
-        self.ai.evaluate(self.board, -1)
+        self.assertEqual(self.ai.evaluate(self.board, -1), -99979976)
 
         self.assertEqual(self.ai.vertical_vals[4], -3)
         self.assertEqual(self.ai.downward_diags_vals[18], 20042)

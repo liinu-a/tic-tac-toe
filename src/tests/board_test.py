@@ -66,7 +66,7 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(self.board.row_of_five((4, 15), -1), True)
 
     def test_row_of_five_cut_off(self):
-        for i in range(9):
+        for i in range(10):
             self.board.mark_board((i, i), 1)
 
         self.board.mark_board((4, 4), -1)
