@@ -72,7 +72,8 @@ class Board():
 
 
     def check_row_of_five(self, col, row, player):
-        """Checks a single row for a row of five.
+        """Checks a single row to determine if a player has gotten a row of five that contains 
+        a move that occupies the given column.
 
         Args:
             row ([int]): The row to be checked of the board.
