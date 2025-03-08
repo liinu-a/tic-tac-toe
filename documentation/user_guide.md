@@ -20,4 +20,4 @@ python3 src/index.py
 ```
 
 ## How to use the application
-The user gets to make the first move and plays as X. The AI plays as O and it may take a couple of seconds before the AI responds to the move made by the user. A messagebox announcing the winner appears once the game has concluded. The game can be restarted by pressing the RESTART button in the lower left corner of the window.
+The user gets to make the first move and plays as X. The AI plays as O, and it may take a couple of seconds before the AI responds to the move made by the user. A messagebox announcing the winner appears once the game has concluded. The game can be restarted by pressing the RESTART button in the lower left corner of the window.
